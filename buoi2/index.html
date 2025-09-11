@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts Management</title>
+</head>
+<body>
+    <script src="./main.js"></script>
+    <div>
+        <h2>Thêm bài viết mới</h2>
+        <!-- Đã ẩn input ID vì tự tăng -->
+        <input type="text" id="title" placeholder="Nhập title">
+        <input type="text" id="view" placeholder="Nhập số views">
+        <input type="button" id="submit" onclick="SaveData()" value="Save">
+    </div>
+    <div>
+        <h2>Danh sách bài viết</h2>
+        <table border="1" style="border-collapse: collapse; width: 100%;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Views</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="body">       
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+  "posts": [
+    {
+      "id": "1",
+      "title": "a title",
+      "views": 100,
+      "isDelete": false
+    },
+    {
+      "id": "2",
+      "title": "another title",
+      "views": 200,
+      "isDelete": false
+    },
+    {
+      "title": "heheeh",
+      "views": "20000",
+      "id": "3",
+      "isDelete": false
+    },
+    {
+      "title": "ugu",
+      "views": "9876",
+      "id": "4",
+      "isDelete": true
+    },
+    {
+      "id": "5",
+      "title": "fghjkp",
+      "views": "89",
+      "isDelete": true
+    }
+  ],
+  "comments": [
+    {
+      "id": "1",
+      "text": "a comment about post 1",
+      "postId": "1"
+    },
+    {
+      "id": "2",
+      "text": "another comment about post 1",
+      "postId": "1"
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}
