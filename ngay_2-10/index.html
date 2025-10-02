@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User & Role Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            border-bottom: 3px solid #667eea;
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 2px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .action-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #495057;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .data-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .notification {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .notification.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .notification.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .notification.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            background: #667eea;
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 User & Role Management System</h1>
+            <p>Quản lý người dùng và vai trò với đầy đủ chức năng CRUD</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('users')">👥 Users</button>
+            <button class="tab" onclick="showTab('roles')">🎭 Roles</button>
+            <button class="tab" onclick="showTab('verify')">✅ Verify User</button>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content active">
+            <h2>👥 Quản lý Users</h2>
+
+            <!-- Notification -->
+            <div id="userNotification" class="notification"></div>
+
+            <!-- Compact Search & Actions -->
+            <div class="action-section">
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" id="userSearch" placeholder="🔍 Tìm theo username hoặc tên..."
+                            onkeypress="if(event.key==='Enter') searchUsers()">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="getUserId" placeholder="🆔 Tìm theo ID..."
+                            onkeypress="if(event.key==='Enter') getUserById()">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="getUserUsername" placeholder="👤 Tìm theo username..."
+                            onkeypress="if(event.key==='Enter') getUserByUsername()">
+                    </div>
+                    <div class="form-group" style="flex: 0 0 auto;">
+                        <button onclick="loadAllUsers()" class="btn-info">📋 Tất cả</button>
+                        <button onclick="toggleCreateForm()" class="btn-success">➕ Thêm</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create User Form (Compact) -->
+            <div id="createUserSection" class="action-section" style="display: none;">
+                <div class="section-title">➕ Tạo User mới</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" id="createUsername" placeholder="Username *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="createPassword" placeholder="Password *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="createEmail" placeholder="Email *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="createFullName" placeholder="Họ tên">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <select id="createRole" required>
+                            <option value="">Chọn role *</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="url" id="createAvatarUrl" placeholder="Avatar URL">
+                    </div>
+                    <div class="form-group" style="flex: 0 0 auto;">
+                        <button class="btn-success" onclick="createUser()">✅ Tạo</button>
+                        <button onclick="toggleCreateForm()">❌ Hủy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Update User Form (Compact) -->
+            <div id="updateUserSection" class="action-section" style="display: none;">
+                <div class="section-title">✏️ Cập nhật User: <span id="updateUserTitle"></span></div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" id="updateUsername" placeholder="Username">
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="updateEmail" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="updateFullName" placeholder="Họ tên">
+                    </div>
+                    <div class="form-group">
+                        <select id="updateRole"></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <select id="updateStatus">
+                            <option value="true">✅ Active</option>
+                            <option value="false">❌ Inactive</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="url" id="updateAvatarUrl" placeholder="Avatar URL">
+                    </div>
+                    <div class="form-group" style="flex: 0 0 auto;">
+                        <button class="btn-success" onclick="updateUser()">✅ Cập nhật</button>
+                        <button onclick="hideUpdateForm()">❌ Hủy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    📊 Danh sách Users
+                    <span id="userCount" class="user-count">0 users</span>
+                </div>
+                <div id="userTableContent">
+                    <div class="empty-state">
+                        <p>🔍 Nhấn "Tất cả" để xem danh sách users hoặc sử dụng tìm kiếm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Roles Tab -->
+        <div id="roles" class="tab-content">
+            <h2>🎭 Quản lý Roles</h2>
+
+            <div id="roleNotification" class="notification"></div>
+
+            <div class="action-section">
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" id="getRoleId" placeholder="🆔 Tìm role theo ID..."
+                            onkeypress="if(event.key==='Enter') getRoleById()">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="createRoleName" placeholder="Tên role mới..." required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="createRoleDescription" placeholder="Mô tả role...">
+                    </div>
+                    <div class="form-group" style="flex: 0 0 auto;">
+                        <button onclick="getAllRoles()" class="btn-info">📋 Tất cả</button>
+                        <button onclick="createRole()" class="btn-success">➕ Tạo Role</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="roleTableContent">
+                <div class="empty-state">
+                    <p>🔍 Nhấn "Tất cả" để xem danh sách roles</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verify User Tab -->
+        <div id="verify" class="tab-content">
+            <h2>✅ Xác thực User</h2>
+
+            <div id="verifyNotification" class="notification"></div>
+
+            <div class="action-section">
+                <div class="section-title">Nhập thông tin để xác thực user</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="email" id="verifyEmail" placeholder="📧 Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="verifyUsername" placeholder="👤 Username" required>
+                    </div>
+                    <div class="form-group" style="flex: 0 0 auto;">
+                        <button class="btn-success" onclick="verifyUser()">✅ Xác thực</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="verifyResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        let currentUpdateUserId = null;
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'users') {
+                loadRolesForDropdown();
+            }
+        }
+
+        // Utility functions
+        function showNotification(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `notification ${type}`;
+            element.textContent = message;
+            element.style.display = 'block';
+
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        async function apiCall(url, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(url, options);
+                const data = await response.json();
+
+                return { data, status: response.status };
+            } catch (error) {
+                return { data: { success: false, message: error.message }, status: 500 };
+            }
+        }
+
+        // Load roles for dropdown
+        async function loadRolesForDropdown() {
+            const result = await apiCall(`${API_BASE}/roles`);
+            if (result.data.success) {
+                const createSelect = document.getElementById('createRole');
+                const updateSelect = document.getElementById('updateRole');
+
+                [createSelect, updateSelect].forEach(select => {
+                    select.innerHTML = '<option value="">Chọn role...</option>';
+                    result.data.data.forEach(role => {
+                        select.innerHTML += `<option value="${role._id}">${role.name}</option>`;
+                    });
+                });
+            }
+        }
+
+        // Display users in table format
+        function displayUsers(users) {
+            const container = document.getElementById('userTableContent');
+            const countElement = document.getElementById('userCount');
+
+            if (!users || users.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>📭 Không tìm thấy user nào</p></div>';
+                countElement.textContent = '0 users';
+                return;
+            }
+
+            countElement.textContent = `${users.length} user${users.length > 1 ? 's' : ''}`;
+
+            const table = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Avatar</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Họ tên</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Login Count</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(user => `
+                            <tr>
+                                <td>
+                                    <img src="${user.avatarUrl || 'https://via.placeholder.com/35/667eea/FFFFFF?text=' + (user.username.charAt(0).toUpperCase())}" 
+                                         alt="Avatar" class="user-avatar" 
+                                         onerror="this.src='https://via.placeholder.com/35/667eea/FFFFFF?text=${user.username.charAt(0).toUpperCase()}'">
+                                </td>
+                                <td><strong>${user.username}</strong></td>
+                                <td>${user.email}</td>
+                                <td>${user.fullName || '-'}</td>
+                                <td>${user.role ? user.role.name : 'N/A'}</td>
+                                <td>
+                                    <span class="status-badge ${user.status ? 'status-active' : 'status-inactive'}">
+                                        ${user.status ? '✅ Active' : '❌ Inactive'}
+                                    </span>
+                                </td>
+                                <td>${user.loginCount || 0}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-info btn-small" onclick="editUser('${user._id}')">✏️</button>
+                                        <button class="btn-danger btn-small" onclick="deleteUser('${user._id}')">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = table;
+        }
+
+        // Display roles in table format
+        function displayRoles(roles) {
+            const container = document.getElementById('roleTableContent');
+
+            if (!roles || roles.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>📭 Không tìm thấy role nào</p></div>';
+                return;
+            }
+
+            const table = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tên Role</th>
+                            <th>Mô tả</th>
+                            <th>Ngày tạo</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${roles.map(role => `
+                            <tr>
+                                <td><strong>${role.name}</strong></td>
+                                <td>${role.description || '-'}</td>
+                                <td>${new Date(role.createdAt).toLocaleDateString('vi-VN')}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-danger btn-small" onclick="deleteRole('${role._id}')">🗑️ Xóa</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = table;
+        }
+
+        // User functions
+        async function loadAllUsers() {
+            const result = await apiCall(`${API_BASE}/users`);
+            if (result.data.success) {
+                displayUsers(result.data.data);
+                showNotification('userNotification', `Đã tải ${result.data.data.length} users`, 'success');
+            } else {
+                showNotification('userNotification', result.data.message, 'error');
+            }
+        }
+
+        async function searchUsers() {
+            const search = document.getElementById('userSearch').value.trim();
+            if (!search) {
+                loadAllUsers();
+                return;
+            }
+
+            const result = await apiCall(`${API_BASE}/users?search=${encodeURIComponent(search)}`);
+            if (result.data.success) {
+                displayUsers(result.data.data);
+                showNotification('userNotification', `Tìm thấy ${result.data.data.length} users`, 'info');
+            } else {
+                showNotification('userNotification', result.data.message, 'error');
+            }
+        }
+
+        async function getUserById() {
+            const id = document.getElementById('getUserId').value.trim();
+            if (!id) {
+                showNotification('userNotification', 'Vui lòng nhập User ID', 'error');
+                return;
+            }
+
+            const result = await apiCall(`${API_BASE}/users/${id}`);
+            if (result.data.success) {
+                displayUsers([result.data.data]);
+                showNotification('userNotification', 'Đã tìm thấy user', 'success');
+            } else {
+                showNotification('userNotification', result.data.message, 'error');
+            }
+
+            document.getElementById('getUserId').value = '';
+        }
+
+        async function getUserByUsername() {
+            const username = document.getElementById('getUserUsername').value.trim();
+            if (!username) {
+                showNotification('userNotification', 'Vui lòng nhập Username', 'error');
+                return;
+            }
+
+            const result = await apiCall(`${API_BASE}/users/username/${username}`);
+            if (result.data.success) {
+                displayUsers([result.data.data]);
+                showNotification('userNotification', 'Đã tìm thấy user', 'success');
+            } else {
+                showNotification('userNotification', result.data.message, 'error');
+            }
+
+            document.getElementById('getUserUsername').value = '';
+        }
+
+        function toggleCreateForm() {
+            const section = document.getElementById('createUserSection');
+            const isVisible = section.style.display !== 'none';
+            section.style.display = isVisible ? 'none' : 'block';
+
+            if (!isVisible) {
+                // Clear form
+                ['createUsername', 'createPassword', 'createEmail', 'createFullName', 'createRole', 'createAvatarUrl'].forEach(id => {
+                    document.getElementById(id).value = '';
+                });
+            }
+        }
+
+        async function createUser() {
+            const userData = {
+                username: document.getElementById('createUsername').value.trim(),
+                password: document.getElementById('createPassword').value,
+                email: document.getElementById('createEmail').value.trim(),
+                fullName: document.getElementById('createFullName').value.trim(),
+                role: document.getElementById('createRole').value,
+                avatarUrl: document.getElementById('createAvatarUrl').value.trim()
+            };
+
+            if (!userData.username || !userData.password || !userData.email || !userData.role) {
+                showNotification('userNotification', 'Vui lòng điền đầy đủ thông tin bắt buộc (*)', 'error');
+                return;
+            }
+
+            const result = await apiCall(`${API_BASE}/users`, 'POST', userData);
+            if (result.data.success) {
+                showNotification('userNotification', 'Tạo user thành công!', 'success');
+                toggleCreateForm();
+                loadAllUsers();
+            } else {
+                showNotification('userNotification', result.data.message, 'error');
+            }
+        }
+
+        async function editUser(userId) {
+            const result = await apiCall(`${API_BASE}/users/${userId}`);
+            if (result.data.success) {
+                const user = result.data.data;
+                currentUpdateUserId = userId;
+
+                document.getElementById('updateUsername').value = user.username;
+                document.getElementById('updateEmail').value = user.email;
+                document.getElementById('updateFullName').value = user.fullName || '';
+                document.getElementById('updateRole').value = user.role._id;
+                document.getElementById('updateStatus').value = user.status.toString();
+                document.getElementById('updateAvatarUrl').value = user.avatarUrl || '';
+                document.getElementById('updateUserTitle').textContent = user.username;
+
+                document.getElementById('updateUserSection').style.display = 'block';
+            } else {
+                showNotification('userNotification', result.data.message, 'error');
+            }
+        }
+
+        function hideUpdateForm() {
+            document.getElementById('updateUserSection').style.display = 'none';
+            currentUpdateUserId = null;
+        }
+
+        async function updateUser() {
+            if (!currentUpdateUserId) return;
+
+            const userData = {
+                username: document.getElementById('updateUsername').value.trim(),
+                email: document.getElementById('updateEmail').value.trim(),
+                fullName: document.getElementById('updateFullName').value.trim(),
+                role: document.getElementById('updateRole').value,
+                status: document.getElementById('updateStatus').value === 'true',
+                avatarUrl: document.getElementById('updateAvatarUrl').value.trim()
+            };
+
+            const result = await apiCall(`${API_BASE}/users/${currentUpdateUserId}`, 'PUT', userData);
+            if (result.data.success) {
+                showNotification('userNotification', 'Cập nhật user thành công!', 'success');
+                hideUpdateForm();
+                loadAllUsers();
+            } else {
+                showNotification('userNotification', result.data.message, 'error');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (confirm('Bạn có chắc chắn muốn xóa user này?')) {
+                const result = await apiCall(`${API_BASE}/users/${userId}`, 'DELETE');
+                if (result.data.success) {
+                    showNotification('userNotification', 'Xóa user thành công!', 'success');
+                    loadAllUsers();
+                } else {
+                    showNotification('userNotification', result.data.message, 'error');
+                }
+            }
+        }
+
+        // Role functions
+        async function getAllRoles() {
+            const result = await apiCall(`${API_BASE}/roles`);
+            if (result.data.success) {
+                displayRoles(result.data.data);
+                showNotification('roleNotification', `Đã tải ${result.data.data.length} roles`, 'success');
+            } else {
+                showNotification('roleNotification', result.data.message, 'error');
+            }
+        }
+
+        async function getRoleById() {
+            const id = document.getElementById('getRoleId').value.trim();
+            if (!id) {
+                showNotification('roleNotification', 'Vui lòng nhập Role ID', 'error');
+                return;
+            }
+
+            const result = await apiCall(`${API_BASE}/roles/${id}`);
+            if (result.data.success) {
+                displayRoles([result.data.data]);
+                showNotification('roleNotification', 'Đã tìm thấy role', 'success');
+            } else {
+                showNotification('roleNotification', result.data.message, 'error');
+            }
+
+            document.getElementById('getRoleId').value = '';
+        }
+
+        async function createRole() {
+            const roleData = {
+                name: document.getElementById('createRoleName').value.trim(),
+                description: document.getElementById('createRoleDescription').value.trim()
+            };
+
+            if (!roleData.name) {
+                showNotification('roleNotification', 'Vui lòng nhập tên role', 'error');
+                return;
+            }
+
+            const result = await apiCall(`${API_BASE}/roles`, 'POST', roleData);
+            if (result.data.success) {
+                showNotification('roleNotification', 'Tạo role thành công!', 'success');
+                document.getElementById('createRoleName').value = '';
+                document.getElementById('createRoleDescription').value = '';
+                getAllRoles();
+                loadRolesForDropdown();
+            } else {
+                showNotification('roleNotification', result.data.message, 'error');
+            }
+        }
+
+        async function deleteRole(roleId) {
+            if (confirm('Bạn có chắc chắn muốn xóa role này?')) {
+                const result = await apiCall(`${API_BASE}/roles/${roleId}`, 'DELETE');
+                if (result.data.success) {
+                    showNotification('roleNotification', 'Xóa role thành công!', 'success');
+                    getAllRoles();
+                    loadRolesForDropdown();
+                } else {
+                    showNotification('roleNotification', result.data.message, 'error');
+                }
+            }
+        }
+
+        // Verify user function
+        async function verifyUser() {
+            const verifyData = {
+                email: document.getElementById('verifyEmail').value.trim(),
+                username: document.getElementById('verifyUsername').value.trim()
+            };
+
+            if (!verifyData.email || !verifyData.username) {
+                showNotification('verifyNotification', 'Vui lòng nhập đầy đủ email và username', 'error');
+                return;
+            }
+
+            const result = await apiCall(`${API_BASE}/users/verify`, 'POST', verifyData);
+            if (result.data.success) {
+                showNotification('verifyNotification', 'Xác thực user thành công! Status đã được cập nhật thành Active.', 'success');
+                document.getElementById('verifyEmail').value = '';
+                document.getElementById('verifyUsername').value = '';
+
+                // Display verified user info
+                document.getElementById('verifyResult').innerHTML = `
+                    <div class="table-container" style="margin-top: 20px;">
+                        <div class="table-header">✅ User đã được xác thực</div>
+                        <table class="data-table">
+                            <tr>
+                                <td><strong>Username:</strong></td>
+                                <td>${result.data.data.username}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td>${result.data.data.email}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Full Name:</strong></td>
+                                <td>${result.data.data.fullName || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td><span class="status-badge status-active">✅ Active</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+            } else {
+                showNotification('verifyNotification', result.data.message, 'error');
+                document.getElementById('verifyResult').innerHTML = '';
+            }
+        }
+
+        // Load roles when page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            loadRolesForDropdown();
+        });
+    </script>
+</body>
+
+</html>
