@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Ảnh</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            font-weight: 300;
+        }
+
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px 20px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #5a6fd8;
+            background: #f8f9ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 14px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .preview {
+            margin: 20px 0;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="pageTitle">📷 Upload Ảnh</h1>
+        
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        <div id="loading" class="loading">Đang upload...</div>
+        
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Click để chọn ảnh hoặc kéo thả ảnh vào đây</div>
+            <div class="upload-hint">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</div>
+        </div>
+        
+        <input type="file" id="fileInput" accept="image/*">
+        
+        <div id="preview" class="preview"></div>
+        
+        <div>
+            <button id="uploadBtn" class="btn btn-primary" onclick="uploadFile()" disabled>📤 Upload</button>
+            <button class="btn btn-secondary" onclick="goBack()">← Quay Lại</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let isAvatarMode = false;
+
+        // Kiểm tra mode từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        isAvatarMode = urlParams.get('mode') === 'avatar';
+
+        // Cập nhật title nếu là avatar mode
+        if (isAvatarMode) {
+            document.getElementById('pageTitle').textContent = '👤 Upload Avatar';
+            document.querySelector('.upload-text').textContent = 'Click để chọn ảnh avatar hoặc kéo thả ảnh vào đây';
+        }
+
+        // Kiểm tra đăng nhập nếu là avatar mode
+        if (isAvatarMode) {
+            checkLoginStatus();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+        
+        // Drag and drop
+        const uploadArea = document.querySelector('.upload-area');
+        
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect({ target: { files: files } });
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                showPreview(file);
+                document.getElementById('uploadBtn').disabled = false;
+            }
+        }
+
+        function showPreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('preview');
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function uploadFile() {
+            if (!selectedFile) return;
+
+            if (isAvatarMode) {
+                await uploadAvatar();
+            } else {
+                await uploadSingleImage();
+            }
+        }
+
+        async function uploadAvatar() {
+            const formData = new FormData();
+            formData.append('avatar', selectedFile);
+
+            try {
+                showLoading(true);
+                hideMessages();
+
+                const response = await fetch('/users/upload-avatar', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('Upload avatar thành công!');
+                    
+                    // Gửi thông báo về home page
+                    if (window.opener) {
+                        window.opener.postMessage({
+                            type: 'imageUploaded',
+                            url: data.data.avatarURL,
+                            name: 'Avatar'
+                        }, '*');
+                    }
+                    
+                    setTimeout(() => {
+                        window.close();
+                    }, 2000);
+                } else {
+                    showError(data.data || 'Upload avatar thất bại');
+                }
+            } catch (error) {
+                showError('Lỗi kết nối: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function uploadSingleImage() {
+            const formData = new FormData();
+            formData.append('images', selectedFile);
+
+            try {
+                showLoading(true);
+                hideMessages();
+
+                const response = await fetch('/files/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('Upload ảnh thành công!');
+                    
+                    // Gửi thông báo về home page
+                    if (window.opener) {
+                        window.opener.postMessage({
+                            type: 'imageUploaded',
+                            url: data.data[0],
+                            name: selectedFile.name
+                        }, '*');
+                    }
+                    
+                    setTimeout(() => {
+                        window.close();
+                    }, 2000);
+                } else {
+                    showError(data.data || 'Upload ảnh thất bại');
+                }
+            } catch (error) {
+                showError('Lỗi kết nối: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function checkLoginStatus() {
+            try {
+                const response = await fetch('/auth/me');
+                const data = await response.json();
+                
+                if (!data.success) {
+                    showError('Bạn cần đăng nhập để upload avatar. Chuyển đến trang đăng nhập...');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                showError('Lỗi kết nối. Chuyển đến trang đăng nhập...');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function goBack() {
+            if (window.opener) {
+                window.close();
+            } else {
+                window.location.href = 'home.html';
+            }
+        }
+    </script>
+</body>
+</html>

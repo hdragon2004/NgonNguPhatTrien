@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Thông Tin User</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            font-weight: 300;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .avatar-container {
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #667eea;
+            margin: 0 auto 15px;
+            display: block;
+        }
+
+        .avatar-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            border: 4px solid #667eea;
+        }
+
+        .user-details {
+            text-align: left;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+            min-width: 100px;
+        }
+
+        .detail-value {
+            color: #333;
+            flex: 1;
+            text-align: right;
+        }
+
+        .role-badge {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .upload-avatar {
+            margin-top: 15px;
+        }
+
+        .upload-avatar input[type="file"] {
+            display: none;
+        }
+
+        .upload-avatar label {
+            background: #17a2b8;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-avatar label:hover {
+            background: #138496;
+        }
+
+        .uploaded-images {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .images-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .images-header h3 {
+            color: #333;
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .images-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .images-stats span {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-clear-all {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-clear-all:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .image-item {
+            position: relative;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .image-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .image-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .image-info {
+            padding: 15px;
+            background: #f8f9fa;
+        }
+
+        .image-info .image-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .image-info .image-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .image-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-item:hover .image-actions {
+            opacity: 1;
+        }
+
+        .image-actions button {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-actions button:hover {
+            background: rgba(0, 0, 0, 1);
+            transform: scale(1.1);
+        }
+
+        .image-actions .view-btn {
+            background: rgba(102, 126, 234, 0.8);
+        }
+
+        .image-actions .view-btn:hover {
+            background: rgba(102, 126, 234, 1);
+        }
+
+        .image-actions .delete-btn {
+            background: rgba(220, 53, 69, 0.8);
+        }
+
+        .image-actions .delete-btn:hover {
+            background: rgba(220, 53, 69, 1);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .user-details {
+                padding: 15px;
+            }
+            
+            .detail-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .detail-value {
+                text-align: left;
+                margin-top: 5px;
+            }
+            
+            .images-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Trang Chủ</h1>
+        
+        <div id="errorMessage" class="error-message"></div>
+        <div id="loading" class="loading">Đang tải thông tin...</div>
+        
+        <div id="userInfo" class="user-info" style="display: none;">
+            <div class="avatar-container">
+                <img id="userAvatar" class="avatar" style="display: none;" alt="Avatar">
+                <div id="avatarPlaceholder" class="avatar-placeholder">
+                    👤
+                </div>
+            </div>
+            
+            <div class="user-details">
+                <div class="detail-item">
+                    <span class="detail-label">👤 Tên đăng nhập:</span>
+                    <span class="detail-value" id="username">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📧 Email:</span>
+                    <span class="detail-value" id="email">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">🎭 Vai trò:</span>
+                    <span class="detail-value">
+                        <span id="role" class="role-badge">-</span>
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📅 Tham gia:</span>
+                    <span class="detail-value" id="createdAt">-</span>
+                </div>
+            </div>
+            
+            <div class="upload-avatar">
+                <input type="file" id="avatarInput" accept="image/*">
+                <label for="avatarInput">📷 Cập nhật ảnh đại diện</label>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="upload-simple.html?mode=avatar" class="btn btn-primary">📷 Upload Avatar</a>
+            <a href="upload-multiple-simple.html" class="btn btn-primary">🖼️ Upload Nhiều Ảnh</a>
+            <button onclick="logout()" class="btn btn-danger">🚪 Đăng Xuất</button>
+        </div>
+        
+        <!-- Hiển thị nhiều ảnh đã upload -->
+        <div id="uploadedImages" class="uploaded-images" style="display: none; margin-top: 30px;">
+            <div class="images-header">
+                <h3>🖼️ Ảnh đã upload</h3>
+                <div class="images-stats">
+                    <span id="imageCount">0 ảnh</span>
+                    <button onclick="clearAllImages()" class="btn-clear-all">🗑️ Xóa tất cả</button>
+                </div>
+            </div>
+            <div id="imagesGrid" class="images-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        // Kiểm tra đăng nhập khi trang load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            loadUploadedImages();
+        });
+
+        async function checkLoginStatus() {
+            try {
+                showLoading(true);
+                
+                const response = await fetch('/auth/me');
+                const data = await response.json();
+                
+                if (data.success) {
+                    showUserInfo(data.data);
+                } else {
+                    showError('Bạn chưa đăng nhập. Chuyển đến trang đăng nhập...');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                showError('Lỗi kết nối: ' + error.message);
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function showUserInfo(user) {
+            document.getElementById('userInfo').style.display = 'block';
+            
+            // Hiển thị thông tin user
+            document.getElementById('username').textContent = user.username || '-';
+            document.getElementById('email').textContent = user.email || '-';
+            document.getElementById('role').textContent = user.role?.name || 'USER';
+            
+            // Hiển thị ngày tạo (nếu có)
+            if (user.createdAt) {
+                const date = new Date(user.createdAt);
+                document.getElementById('createdAt').textContent = date.toLocaleDateString('vi-VN');
+            } else {
+                document.getElementById('createdAt').textContent = '-';
+            }
+            
+            // Hiển thị avatar
+            if (user.avatarURL) {
+                document.getElementById('userAvatar').src = user.avatarURL;
+                document.getElementById('userAvatar').style.display = 'block';
+                document.getElementById('avatarPlaceholder').style.display = 'none';
+            } else {
+                document.getElementById('userAvatar').style.display = 'none';
+                document.getElementById('avatarPlaceholder').style.display = 'flex';
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/auth/logout', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Đăng xuất thành công!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Lỗi khi đăng xuất: ' + data.data);
+                }
+            } catch (error) {
+                alert('Lỗi kết nối: ' + error.message);
+            }
+        }
+
+        // Xử lý upload avatar
+        document.getElementById('avatarInput').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            try {
+                showLoading(true);
+                
+                const response = await fetch('/users/upload-avatar', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Cập nhật avatar hiển thị ngay lập tức
+                    document.getElementById('userAvatar').src = data.data.avatarURL;
+                    document.getElementById('userAvatar').style.display = 'block';
+                    document.getElementById('avatarPlaceholder').style.display = 'none';
+                    
+                    // Thêm ảnh vào danh sách ảnh đã upload
+                    addImageToGrid(data.data.avatarURL, 'Avatar', new Date());
+                    
+                    alert('Cập nhật avatar thành công!');
+                } else {
+                    alert('Lỗi khi upload avatar: ' + data.data);
+                }
+            } catch (error) {
+                alert('Lỗi kết nối: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Hàm tải ảnh đã upload
+        async function loadUploadedImages() {
+            try {
+                // Lấy ảnh từ localStorage (có thể thay bằng API thực tế)
+                const savedImages = JSON.parse(localStorage.getItem('uploadedImages') || '[]');
+                
+                if (savedImages.length > 0) {
+                    document.getElementById('uploadedImages').style.display = 'block';
+                    const grid = document.getElementById('imagesGrid');
+                    grid.innerHTML = '';
+                    
+                    savedImages.forEach(image => {
+                        // Tạo element ảnh trực tiếp (không gọi addImageToGrid để tránh duplicate)
+                        const imageItem = document.createElement('div');
+                        imageItem.className = 'image-item';
+                        imageItem.innerHTML = `
+                            <div class="image-actions">
+                                <button class="view-btn" onclick="viewImage('${image.url}')" title="Xem ảnh">👁️</button>
+                                <button class="delete-btn" onclick="deleteImage(this)" title="Xóa ảnh">🗑️</button>
+                            </div>
+                            <img src="${image.url}" alt="${image.name}" onclick="viewImage('${image.url}')">
+                            <div class="image-info">
+                                <div class="image-name">${image.name}</div>
+                                <div class="image-date">${new Date(image.date).toLocaleDateString('vi-VN')}</div>
+                            </div>
+                        `;
+                        grid.appendChild(imageItem);
+                    });
+                    
+                    // Cập nhật số lượng ảnh
+                    updateImageCount();
+                }
+            } catch (error) {
+                console.error('Lỗi khi tải ảnh:', error);
+            }
+        }
+
+        // Hàm thêm ảnh vào grid
+        function addImageToGrid(imageUrl, imageName, uploadDate) {
+            const grid = document.getElementById('imagesGrid');
+            const uploadedImages = document.getElementById('uploadedImages');
+            
+            // Hiển thị section ảnh nếu chưa hiển thị
+            uploadedImages.style.display = 'block';
+            
+            // Tạo element ảnh
+            const imageItem = document.createElement('div');
+            imageItem.className = 'image-item';
+            imageItem.innerHTML = `
+                <div class="image-actions">
+                    <button class="view-btn" onclick="viewImage('${imageUrl}')" title="Xem ảnh">👁️</button>
+                    <button class="delete-btn" onclick="deleteImage(this)" title="Xóa ảnh">🗑️</button>
+                </div>
+                <img src="${imageUrl}" alt="${imageName}" onclick="viewImage('${imageUrl}')">
+                <div class="image-info">
+                    <div class="image-name">${imageName}</div>
+                    <div class="image-date">${uploadDate.toLocaleDateString('vi-VN')}</div>
+                </div>
+            `;
+            
+            grid.appendChild(imageItem);
+            
+            // Lưu vào localStorage
+            const savedImages = JSON.parse(localStorage.getItem('uploadedImages') || '[]');
+            savedImages.push({
+                url: imageUrl,
+                name: imageName,
+                date: uploadDate.toISOString()
+            });
+            localStorage.setItem('uploadedImages', JSON.stringify(savedImages));
+            
+            // Cập nhật số lượng ảnh
+            updateImageCount();
+        }
+
+        // Hàm xem ảnh
+        function viewImage(imageUrl) {
+            window.open(imageUrl, '_blank');
+        }
+
+        // Hàm xóa ảnh
+        function deleteImage(button) {
+            if (confirm('Bạn có chắc muốn xóa ảnh này?')) {
+                const imageItem = button.closest('.image-item');
+                const imageUrl = imageItem.querySelector('img').src;
+                
+                // Xóa khỏi DOM
+                imageItem.remove();
+                
+                // Xóa khỏi localStorage
+                const savedImages = JSON.parse(localStorage.getItem('uploadedImages') || '[]');
+                const filteredImages = savedImages.filter(img => img.url !== imageUrl);
+                localStorage.setItem('uploadedImages', JSON.stringify(filteredImages));
+                
+                // Cập nhật số lượng ảnh
+                updateImageCount();
+                
+                // Ẩn section nếu không còn ảnh
+                const grid = document.getElementById('imagesGrid');
+                if (grid.children.length === 0) {
+                    document.getElementById('uploadedImages').style.display = 'none';
+                }
+            }
+        }
+
+        // Hàm cập nhật số lượng ảnh
+        function updateImageCount() {
+            const grid = document.getElementById('imagesGrid');
+            const count = grid.children.length;
+            document.getElementById('imageCount').textContent = `${count} ảnh`;
+        }
+
+        // Hàm xóa tất cả ảnh
+        function clearAllImages() {
+            if (confirm('Bạn có chắc muốn xóa tất cả ảnh?')) {
+                const grid = document.getElementById('imagesGrid');
+                grid.innerHTML = '';
+                
+                // Xóa khỏi localStorage
+                localStorage.removeItem('uploadedImages');
+                
+                // Ẩn section
+                document.getElementById('uploadedImages').style.display = 'none';
+                
+                // Cập nhật số lượng
+                updateImageCount();
+            }
+        }
+
+        // Lắng nghe message từ các trang upload
+        window.addEventListener('message', function(e) {
+            if (e.data.type === 'imageUploaded') {
+                addImageToGrid(e.data.url, e.data.name, new Date());
+            }
+        });
+    </script>
+</body>
+</html>
